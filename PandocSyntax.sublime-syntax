@@ -1,6 +1,6 @@
 %YAML 1.2
 ---
-name: Pandoc
+name: Pandoc-YAML
 file_extensions: [md, pd]
 scope: text.html.markdown
 comment: Scopes set for compatibility with Monokai Extended.
@@ -49,7 +49,7 @@ contexts:
     - match: ^(\#\#)\s(.*)(\{.*\})$
       captures:
         1: comment.block.html
-        2: markup.heading.1.markdown
+        2: markup.heading.2.markdown
         3: comment.block.html
       pop: true
     - match: ^(\#\#)\s(.*)
@@ -60,7 +60,7 @@ contexts:
     - match: ^(\#\#\#)\s(.*)(\{.*\})$
       captures:
         1: comment.block.html
-        2: markup.heading.1.markdown
+        2: markup.heading.3.markdown
         3: comment.block.html
       pop: true
     - match: ^(\#\#\#)\s(.*)
@@ -71,7 +71,7 @@ contexts:
     - match: ^(\#\#\#\#)\s(.*)(\{.*\})$
       captures:
         1: comment.block.html
-        2: markup.heading.1.markdown
+        2: markup.heading.4.markdown
         3: comment.block.html
       pop: true
     - match: ^(\#\#\#\#)\s(.*)
@@ -79,35 +79,38 @@ contexts:
         1: comment.block.html
         2: markup.heading.4.markdown
       pop: true
-    - match: ^\s*(\>)(.*) # Block quote
+    - match: ^\s*(\>)(.*?) # Block quote
       captures:
-        1: comment.block.markdown
-        2: markup.quote.markdown
-      push: # Allows "lazy" block quotes but continues to comment leading >
+        1: comment.block.markdown.block.1
+        2: markup.quote.markdown.block.1
+      push: 
+      # Allows "lazy" block quotes but continues to comment leading >
         - match: ^\s*\>
-          scope: comment.block.markdown
-        - meta_scope: markup.quote.markdown
+          scope: comment.block.markdown.block.2
+        - meta_scope: markup.quote.markdown.block.2
         - match: ^$
           pop: true
-    - match: ^(\| )(.*)(?<!\|)$  # Line block (highlighted as block quote)
+    - match: ^(\| )(.*)(?<!\|)$  
+    # Line block (highlighted as block quote)
       captures:
         1: comment.block.markdown
-        2: markup.quote.markdown
+        2: markup.quote.markdown.lineblock.1
       push:
         - match: ^\| 
           scope: comment.block.markdown
-        - meta_scope: markup.quote.markdown
+        - meta_scope: markup.quote.markdown.lineblock.2
         - match: ^$
           pop: true
-    - match: ^ {4}.*  # Verbatim (code) block
-      scope: markup.raw.block.markdown
+    - match: ^ {4}.*  
+    # Verbatim (code) block
+      scope: markup.raw.block.markdown.verbatim.1
       pop: true
     - match: ^(~~~|```) # Fenced code block
-      scope: comment.block.markdown
+      scope: comment.block.markdown.verbatim.1
       push:
-        - meta_scope: markup.raw.block.markdown
+        - meta_scope: markup.raw.block.markdow.verbatim.2n
         - match: ^(?:~~~|```).*
-          scope: comment.block.markdown
+          scope: comment.block.markdown.verbatim.2
           pop: true
     - match: (?=^.*)
       pop: true
@@ -253,42 +256,74 @@ contexts:
             pop: true
 
   footnotes:
-    - match: (\[\^)(.*)(\])[^\:]              # Footnote marker
+    - match: (\[\^)(.*?)(\])[^\:]              
+    # Footnote marker
       captures:
         1: comment.block.html
-        2: constant.other.reference.link.markdown
+        2: constant.other.reference.link.markdown.footnotes
         3: comment.block.html
-    - match: ^\s*(\[\^)(.*)(\]\:)(.*)   # Footnote definition
+    - match: ^\s*(\[\^)(.*?)(\]\:)(.*?)   
+    # Footnote definition
       captures: 
         1: comment.block.html
-        2: constant.other.reference.link.markdown
+        2: constant.other.reference.link.markdown.footnotes.definition
         3: comment.block.html
-        4: string.other.link.description.markdown
-      push: # Only allows subsequent pars if all indented. Not strictly correct.
-        - meta_scope: string.other.link.description.markdown
+        4: string.other.link.description.markdown.footnote.definition
+      push: 
+      # Only allows subsequent pars if all indented. Not strictly correct.
+        - include: citations
+        - include: text_formatting
+        - meta_scope: string.other.link.description.markdown.footnotes.definition
         - match: (?=^\s*$)
           set: 
-            - meta_scope: string.other.link.description.markdown
+            - meta_scope: string.other.link.description.markdown.footnotes.definition
+            - include: citations
             - include: text_formatting
             - match: (?=^\s{0,3}[^\s])
               pop: true
-    - match: \^\[                   # Inline notes
+    - match: \^\[                   
+    # Inline notes
       scope: comment.block.markdown
       push:
-        - meta_scope: string.other.link.description.markdown
+        - meta_scope: string.other.link.description.markdown.footnotes.inline
+        - include: citations 
         - match: \]
           scope: comment.block.markdown
           pop: true
 
   citations:
-    - match: (\[)([^\]]*\@) # The @ can be anywhere in the link.
+    - include: citations_full
+    - include: citations_short
+
+  citations_full:
+    - match: (\[)([^\]]*?\-?\@) 
+    # The @ can be anywhere in the body
+      captures:
+        1: comment.block.markdown
+        2: constant.other.reference.link.markdown.full.1
+      push:
+        - meta_scope: constant.other.reference.link.markdown.full.2
+        - match: \]
+          scope: comment.block.html
+          pop: true
+
+  citations_short:
+    - match: \-?\@\w+ 
+    #can just be an @citeref all by itself
+      scope: constant.other.reference.link.markdown.short.1
+      push:
+        - meta_scope: constant.other.reference.link.markdown.short.2
+        - match: \s+?
+          pop: true
+    - match: (\[)(p\.[0-9a-i\-\,]+?) 
+    # can be followed by [p.1-11,27] page ref
       captures:
         1: comment.block.markdown
         2: constant.other.reference.link.markdown
       push:
         - meta_scope: constant.other.reference.link.markdown
         - match: \]
-          scope: comment.block.html
+          scope: comment.block.markdown
           pop: true
 
   pandoc-figref:

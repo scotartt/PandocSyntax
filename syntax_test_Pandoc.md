@@ -24,7 +24,7 @@ supported.
 
 #### Heading 4 {-}
 
-- This is a list
+- This is a list with *italics*
 - Item **2** of list
 
 -   Still a list, but with multiple paragraphs in an item.
@@ -49,7 +49,7 @@ labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
 exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis
 aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
 fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-culpa qui officia deserunt mollit anim id est laborum.
+culpa qui officia deserunt mollit anim id est laborum.^[inline with @citation from [p.1]]
 
 [ref]: \url
 
@@ -57,26 +57,30 @@ culpa qui officia deserunt mollit anim id est laborum.
 
 [Figure 2]: /path
 
-> A quote.
-    That continues on the next line.
-> 
-> Next part of quote.
+ > A quote with *italics*. After the italics.
+    That *continues* on the **next** line.
+ > 
+ >Next part of *quote*.
 
 Lorem ipsum dolor sit amet,[^noteref] consectetur adipisicing elit, sed do
 eiusmod tempor incididunt ut labore et dolore magna aliqua.^[Inline footnote]
 Ut enim ad minim veniam,[@citation] quis nostrud exercitation ullamco laboris
-nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+nisi ut aliquip ex ea commodo consequat.[^noteref] Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.[^noteref]
 Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
-deserunt mollit anim id est laborum.
+deserunt mollit anim id est laborum. @citation with no brackets. @citation [p.2] [-@citation p.3].
 
-[^noteref]: This is a footnote.
+ [^noteref]: This is a *footnote*. Inline cite with page ref: -@citation [p.2] this seems to only work when indented one space.
+
 
 | A line block.
-|   Which will preserve leading spaces.
+|   Which will preserve *leading* spaces.
+
+```
+A fenced code block.
+```
 
 ~~~
-A fenced code block.
+A tilde fenced code block
 ~~~
 
 Or just indent code:
